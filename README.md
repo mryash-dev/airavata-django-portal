@@ -1,199 +1,176 @@
 # Apache Airavata Django Portal
 
 ![Build Status](https://github.com/apache/airavata-django-portal/actions/workflows/build-and-test.yaml/badge.svg)
-[![Build Status](https://readthedocs.org/projects/apache-airavata-django-portal/badge/?version=latest)](https://apache-airavata-django-portal.readthedocs.io/en/latest/?badge=latest)
+[![Docs](https://readthedocs.org/projects/apache-airavata-django-portal/badge/?version=latest)](https://apache-airavata-django-portal.readthedocs.io/en/latest/?badge=latest)
 
-The Airavata Django Portal is a web interface to the
-[Apache Airavata](http://airavata.apache.org/) API implemented using the Django
-web framework. The intention is that the Airavata Django Portal can be used as
-is for a full featured web based science gateway but it can also be customized
-through various plugins to add more domain specific functionality as needed.
+A modern, extensible web portal for [Apache Airavata](http://airavata.apache.org/) built with Django, Vue.js, and Wagtail CMS. Designed for science gateways and research platforms, with plugin support and a robust API.
 
-## Getting Started
+---
 
-The following steps will help you quickly get started with running the Airavata
-Django Portal locally. This will allow you to try it out and can also be used as
-a development environment. If you just want to run the Airavata Django Portal
-locally, see the Docker instructions below for a more simplified approach.
+## 🚀 Features
+- Full-featured science gateway UI for Airavata
+- Customizable via plugins and Wagtail CMS
+- Modern Vue.js frontend (built with Yarn workspaces)
+- REST API and Django admin
+- Dockerized for easy deployment
+- MySQL, Postgres, or SQLite support
 
-The Airavata Django Portal works with Python versions 3.6 - 3.10. You'll need
-one of these versions installed locally.
+---
 
-You'll also need Node.js and yarn to build the JavaScript frontend code. Please
-install Node.js version 19. You
-can also use [nvm](https://github.com/nvm-sh/nvm) to manage the Node.js install.
-If you have nvm installed you can run `nvm install && nvm use` before running
-any yarn commands. See
-[the Yarn package manager](https://classic.yarnpkg.com/lang/en/) for information
-on how to install Yarn 1 (Classic).
+## 🐳 Quick Start (Production with Docker)
 
-1.  Checkout this project and create a virtual environment.
-
-    ```
-    git clone https://github.com/apache/airavata-django-portal.git
-    cd airavata-django-portal
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install --upgrade pip setuptools wheel
-    pip install -r requirements.txt
-    ```
-
-    - **Windows note**: Use ```venv\Scripts\activate``` instead of ```source venv/bin/activate```
-      <!-- https://docs.python.org/3/library/venv.html -->
-
-    - **macOS note**: to install the MySQL dependencies you need to have the
-      MySQL development headers and libraries installed. Also, on macOS you need
-      to have openssl installed. See the
-      [mysqlclient-python installation notes](https://github.com/PyMySQL/mysqlclient-python#install)
-      for more details.
-
-2.  Create a local settings file.
-
-    - Option 1 (**recommended**). The best way to get a local settings file is
-      to download one from an existing Airavata Django Portal instance. If you
-      have Admin access, you can log in, go to _Settings_ and then _Developer
-      Console_ (/admin/developers) and download a `settings_local.py` file for
-      local development. Save it to the `django_airavata/` directory.
-
-    - Option 2. Otherwise, if you know the hostname and ports of an Airavata
-      deployment, you can copy `django_airavata/settings_local.py.sample` to
-      `django_airavata/settings_local.py` and edit the contents to match your
-      Keycloak and Airavata server deployments.
-
-      ```
-      cp django_airavata/settings_local.py.sample django_airavata/settings_local.py
-      ```
-
-3.  Run Django migrations
-
-    ```
-    python manage.py migrate
-    ```
-
-4.  Build the JavaScript sources. There are a few JavaScript packages in the
-    source tree, colocated with the Django apps in which they are used. The
-    `build_js.sh` script will build them all.
-
-    ```
-    ./build_js.sh
-    ```
-
-    - **Window note**: on Windows, run `.\build_js.bat` instead
-
-5.  Load the default Wagtail CMS pages.
-
-    ```
-    python manage.py load_cms_data new_default_theme
-    ```
-
-6.  Run the server
-
-    ```
-    python manage.py runserver
-    ```
-
-7.  Point your browser to http://localhost:8000.
-
-## Docker instructions
-
-To run the Django Portal as a Docker container, you need a `settings_local.py`
-file which you can create from the `settings_local.py.sample` file. Then run the
-following:
-
-1. Build the Docker image.
-
-   ```
-   docker build -t airavata-django-portal .
-   ```
-
-2. Run the Docker container.
-
-   ```
-   docker run -d \
-     -v /path/to/my/settings_local.py:/code/django_airavata/settings_local.py \
-     -p 8000:8000 airavata-django-portal
-   ```
-
-3. Load an initial set of Wagtail pages (theme). You only need to do this when
-   starting the container for the first time.
-
-   ```
-   docker exec CONTAINER_ID python manage.py load_cms_data new_default_theme
-   ```
-
-4. Point your browser to http://localhost:8000.
-
-### Multi-architecture images
-
-To build and push
-[multi-architecture images](https://docs.docker.com/desktop/multi-arch/), first
-create a builder (one time)
-
-```
-docker buildx create --name mybuilder --use
+### 1. Build the Docker Image
+```bash
+docker build -t airavata-django-portal .
 ```
 
-then run
-
-```
-docker buildx build --pull --platform linux/amd64,linux/arm64 -t apache/airavata-django-portal:latest --push .
-```
-
-## Documentation
-
-Documentation currently is available at
-https://apache-airavata-django-portal.readthedocs.io/en/latest/ (built from the
-'docs' directory).
-
-To build the documentation locally, first
-[set up a development environment](#setting-up-development-environment), then
-run the following in the root of the project:
-
-```
-mkdocs serve
+### 2. Start a MySQL Test Container
+```bash
+docker run -d \
+  --name mysql-airavata \
+  -e MYSQL_ROOT_PASSWORD=rootpass \
+  -e MYSQL_DATABASE=airavata_db \
+  -e MYSQL_USER=airavata_user \
+  -e MYSQL_PASSWORD=airavata_pass \
+  -p 3306:3306 \
+  mysql:8.0
 ```
 
-## Feedback
+### 3. Prepare `settings_local.py`
+Create `django_airavata/settings_local.py` with:
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'airavata_db',
+        'USER': 'airavata_user',
+        'PASSWORD': 'airavata_pass',
+        'HOST': 'mysql-airavata',
+        'PORT': '3306',
+    }
+}
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+```
 
-Please send feedback to the mailing list at <dev@airavata.apache.org>. If you
-encounter bugs or would like to request a new feature you can do so in the
-[Airavata Jira project](https://issues.apache.org/jira/projects/AIRAVATA) (just
-select the _Django Portal_ component when you make your issue).
+### 4. Run the Portal (Mounting settings_local.py)
+```bash
+docker run -d \
+  --name airavata-app \
+  --link mysql-airavata:mysql \
+  -p 8000:8000 \
+  -v $(pwd)/django_airavata/settings_local.py:/app/django_airavata/settings_local.py \
+  airavata-django-portal
+```
 
-## Customization
+### 5. Run Migrations & Collect Static Files
+```bash
+docker exec -it airavata-app python manage.py migrate
+docker exec -it airavata-app python manage.py collectstatic --noinput
+```
 
-See the Customization Guide in the
-[documentation](https://apache-airavata-django-portal.readthedocs.io/en/latest/)
-for information on how to customize the Airavata Django Portal user interface.
-To get started we recommend going through the
-[Gateways Tutorial](https://apache-airavata-django-portal.readthedocs.io/en/latest/tutorial/gateways_tutorial/).
-This tutorial covers the different ways that the user interface can be
-customized.
+- App available at: http://localhost:8000/home/
+- Logs: `docker logs airavata-app`
 
-## Contributing
+---
 
-For general information on how to contribute, please see the
-[Get Involved](http://airavata.apache.org/get-involved.html) section of the
-Apache Airavata website.
+## 💻 Local Development Setup
 
-### Setting up development environment
+### 1. Clone & Python Virtualenv
+```bash
+git clone https://github.com/apache/airavata-django-portal.git
+cd airavata-django-portal
+python3 -m venv venv
+source venv/bin/activate
+pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
+```
 
-Run `pip install -r requirements-dev.txt` to install development and testing
-libraries.
+### 2. Node.js & Yarn
+- Use **Node.js 18+** (or 20+ if all dependencies support it)
+- Install Yarn classic:
+  ```bash
+  npm install -g yarn
+  yarn --version
+  ```
 
-Use a code editor that integrates with editorconfig and flake8. I also recommend
-autopep8 for automatically formatting code to follow the PEP8 guidelines.
-Prettier is used for formatting JavaScript and Vue.js code.
+### 3. Create/Edit `settings_local.py`
+- Copy from sample:
+  ```bash
+  cp django_airavata/settings_local.py.sample django_airavata/settings_local.py
+  # Edit as needed for DB, Airavata, Keycloak, etc.
+  ```
 
-See the docs for more information on
-[developing the backend](./docs/dev/developing_backend.md) and
-[frontend code](./docs/dev/developing_frontend.md).
+### 4. Build Frontend Assets
+```bash
+./build_js.sh
+```
 
-### Running Django Tests
+### 5. Run Migrations & Load CMS Data
+```bash
+python manage.py migrate
+python manage.py load_cms_data new_default_theme
+```
 
-Run `./runtests.py` to run the Django unit tests.
+### 6. Start the Dev Server
+```bash
+python manage.py runserver
+```
 
-## License
+- Visit: http://localhost:8000/home/
 
-The Apache Airavata Django Portal is licensed under the Apache 2.0 license. For
-more information see the [LICENSE](LICENSE) file.
+---
+
+## 🧩 Customization & Plugins
+- Extend via Django apps or Wagtail CMS
+- See [Customization Guide](https://apache-airavata-django-portal.readthedocs.io/en/latest/)
+- Add Vue.js components in `static/common/components/`
+
+---
+
+## 🧪 Testing & Development
+- **Run tests:** `./runtests.py`
+- **Lint Python:** `flake8 .`
+- **Format Python:** `autopep8 --in-place --recursive .`
+- **Lint/Format JS:** `yarn lint` / `yarn prettier`
+- **Dev docs:** See `docs/dev/`
+
+---
+
+## 📚 Documentation
+- [Read the Docs](https://apache-airavata-django-portal.readthedocs.io/en/latest/)
+- Build locally: `mkdocs serve`
+
+---
+
+## 🤝 Contributing
+- Fork, branch, and submit PRs!
+- See [Get Involved](http://airavata.apache.org/get-involved.html)
+- Use [Jira](https://issues.apache.org/jira/projects/AIRAVATA) for bugs/features (select _Django Portal_ component)
+
+---
+
+## 📝 License
+Apache License 2.0 — see [LICENSE](LICENSE)
+
+---
+
+## ❓ Troubleshooting & FAQ
+
+- **Static files not loading?**
+  - Make sure you ran `collectstatic` after building frontend assets.
+  - Check `STATIC_ROOT` in your settings.
+- **DB connection errors in Docker?**
+  - Use `DB_HOST='mysql-airavata'` (not `localhost`)
+  - Ensure MySQL container is running and healthy.
+- **Frontend build fails (minimatch/node version)?**
+  - Use Node 20+ if needed, or restore original `yarn.lock`.
+- **Live reload for development?**
+  - Mount the whole codebase as a volume and use Django’s dev server.
+- **Need to reset DB?**
+  - Drop/recreate the MySQL DB, then rerun migrations and `load_cms_data`.
+
+---
+
+For more help, email <dev@airavata.apache.org> or open an issue!
